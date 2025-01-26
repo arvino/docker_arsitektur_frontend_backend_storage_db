@@ -138,11 +138,6 @@ docker-compose logs frontend1
 docker-compose logs mysql
 ```
 
-
-## Developer
-- **Nama**: Arvino Zulka
-- **Website**: [https://www.arvino.my.id/](https://www.arvino.my.id/)
-
 ## Docker Swarm Setup
 
 ### 1. Inisialisasi Swarm
@@ -213,3 +208,8 @@ docker node update --availability drain <node-id>
 # Activate node setelah maintenance
 docker node update --availability active <node-id>
 ```
+
+
+## Developer
+- **Nama**: Arvino Zulka
+- **Website**: [https://www.arvino.my.id/](https://www.arvino.my.id/)
