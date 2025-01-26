@@ -1,0 +1,80 @@
+version: '3.8'
+
+networks:
+  app_network:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 192.168.7.0/24
+
+services:
+  frontend:
+    image: ${REGISTRY:-localhost}/frontend:latest
+    build:
+      context: ./docker/frontend
+    networks:
+      - app_network
+    deploy:
+      mode: replicated
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role != manager
+    volumes:
+      - ./src/frontend:/var/www/html
+
+  backend:
+    image: ${REGISTRY:-localhost}/backend:latest
+    build:
+      context: ./docker/backend
+    networks:
+      - app_network
+    deploy:
+      placement:
+        constraints:
+          - node.role != manager
+    volumes:
+      - ./src/backend:/var/www/html
+
+  storage:
+    image: ${REGISTRY:-localhost}/storage:latest
+    build:
+      context: ./docker/storage
+    networks:
+      - app_network
+    deploy:
+      placement:
+        constraints:
+          - node.role != manager
+    volumes:
+      - type: bind
+        source: /docker_storage_file/app1
+        target: /var/www/public/uploads
+
+  mysql:
+    image: ${REGISTRY:-localhost}/mysql:latest
+    build:
+      context: ./docker/mysql
+    networks:
+      - app_network
+    deploy:
+      placement:
+        constraints:
+          - node.role != manager
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+    driver: local 

@@ -142,3 +142,74 @@ docker-compose logs mysql
 ## Developer
 - **Nama**: Arvino Zulka
 - **Website**: [https://www.arvino.my.id/](https://www.arvino.my.id/)
+
+## Docker Swarm Setup
+
+### 1. Inisialisasi Swarm
+```bash
+# Di Master Node (192.168.7.10)
+docker swarm init --advertise-addr 192.168.7.10
+
+# Simpan token join yang dihasilkan untuk worker nodes
+```
+
+### 2. Join Worker Nodes
+```bash
+# Di setiap worker node, jalankan perintah join yang didapat dari master
+docker swarm join --token <worker-token> 192.168.7.10:2377
+```
+
+### 3. Deploy Stack
+```bash
+# Di Master Node
+docker stack deploy -c docker-stack.yml app_stack
+
+# Verifikasi deployment
+docker stack ps app_stack
+docker service ls
+```
+
+### 4. Scaling dan Failover
+```bash
+# Scale service
+docker service scale app_stack_frontend=5
+
+# Cek status node
+docker node ls
+
+# Cek service logs
+docker service logs app_stack_frontend
+```
+
+### 5. Update Service
+```bash
+# Update image
+docker service update --image newimage:tag app_stack_frontend
+
+# Rolling update dengan zero downtime
+docker service update --update-parallelism 1 --update-delay 10s app_stack_frontend
+```
+
+## Monitoring Swarm
+
+### 1. Service Health
+```bash
+# Cek status services
+docker service ls
+docker service ps app_stack_frontend
+
+# Inspect service
+docker service inspect app_stack_frontend
+```
+
+### 2. Node Management
+```bash
+# List semua node
+docker node ls
+
+# Drain node untuk maintenance
+docker node update --availability drain <node-id>
+
+# Activate node setelah maintenance
+docker node update --availability active <node-id>
+```
