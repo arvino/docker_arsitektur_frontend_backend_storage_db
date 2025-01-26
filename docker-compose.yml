@@ -1,0 +1,74 @@
+version: '3.8'
+
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.7.0/24
+
+services:
+  frontend1:
+    build:
+      context: ./docker/frontend
+    networks:
+      app_network:
+        ipv4_address: 192.168.7.10
+    volumes:
+      - ./src/frontend:/var/www/html
+
+  frontend2:
+    build:
+      context: ./docker/frontend
+    networks:
+      app_network:
+        ipv4_address: 192.168.7.11
+    volumes:
+      - ./src/frontend:/var/www/html
+
+  frontend3:
+    build:
+      context: ./docker/frontend
+    networks:
+      app_network:
+        ipv4_address: 192.168.7.12
+    volumes:
+      - ./src/frontend:/var/www/html
+
+  backend:
+    build:
+      context: ./docker/backend
+    networks:
+      app_network:
+        ipv4_address: 192.168.7.13
+    volumes:
+      - ./src/backend:/var/www/html
+
+  storage:
+    build:
+      context: ./docker/storage
+    networks:
+      app_network:
+        ipv4_address: 192.168.7.14
+    volumes:
+      - ./storage:/var/www/storage
+      - type: bind
+        source: /docker_storage_file/app1
+        target: /var/www/public/uploads
+
+  mysql:
+    build:
+      context: ./docker/mysql
+    networks:
+      app_network:
+        ipv4_address: 192.168.7.15
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data: 

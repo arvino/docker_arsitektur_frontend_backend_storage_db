@@ -1,0 +1,15 @@
+.
+├── docker-compose.yml
+├── .env
+└── docker
+    ├── frontend
+    │   ├── Dockerfile
+    │   └── nginx.conf
+    ├── backend
+    │   ├── Dockerfile
+    │   └── nginx.conf
+    ├── storage
+    │   ├── Dockerfile
+    │   └── nginx.conf
+    └── mysql
+        └── Dockerfile 
